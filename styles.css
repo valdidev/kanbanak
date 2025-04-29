@@ -77,10 +77,36 @@ body {
   margin-bottom: 15px;
   font-size: 1.2em;
   cursor: pointer;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .column-header:hover {
   background-color: #3b82f6;
+}
+
+.delete-column-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: #991b1b;
+  color: #e5e7eb;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  font-size: 0.9em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.delete-column-btn:hover {
+  background-color: #dc2626;
 }
 
 .tasks {
@@ -278,6 +304,11 @@ body {
   max-width: 500px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
   color: #e5e7eb;
+}
+
+.modal-content p {
+  margin: 0 0 15px;
+  font-size: 1em;
 }
 
 .modal-header {

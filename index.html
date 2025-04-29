@@ -16,14 +16,14 @@
         id="scrollLeftBtn"
         onclick="scrollToLeft()"
       >
-        &lt;
+        <
       </button>
       <button
         class="scroll-btn scroll-right"
         id="scrollRightBtn"
         onclick="scrollToRight()"
       >
-        &gt;
+        >
       </button>
     </div>
 
@@ -57,6 +57,22 @@
         <div class="modal-buttons">
           <button class="save-btn" onclick="saveColumnEdit()">Guardar</button>
           <button class="cancel-btn" onclick="closeColumnModal()">
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="deleteColumnModal">
+      <div class="modal-content">
+        <div class="modal-header">Confirmar Eliminación</div>
+        <p>
+          ¿Estás seguro de que quieres eliminar esta columna? Todas las tareas
+          asociadas se perderán.
+        </p>
+        <div class="modal-buttons">
+          <button class="save-btn" onclick="deleteColumn()">Eliminar</button>
+          <button class="cancel-btn" onclick="closeDeleteColumnModal()">
             Cancelar
           </button>
         </div>

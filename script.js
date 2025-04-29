@@ -43,7 +43,9 @@ function createColumn(columnId, title, tasks) {
   column.id = columnId;
   column.draggable = true;
   column.innerHTML = `
-        <div class="column-header" onclick="openColumnEditModal('${columnId}')">${title}</div>
+        <div class="column-header" onclick="openColumnEditModal('${columnId}')">${title}
+            <button class="delete-column-btn" onclick="event.stopPropagation(); openDeleteColumnModal('${columnId}')">X</button>
+        </div>
         <input type="text" class="task-input" placeholder="Nueva tarea..." onkeydown="if(event.key === 'Enter') addTask('${columnId}')">
         <button class="add-task" onclick="addTask('${columnId}')">Añadir Tarea</button>
         <div class="tasks"></div>
@@ -141,6 +143,34 @@ function addNewColumn() {
   createColumn(columnId, `Columna ${columnCount}`, []);
   createAddColumnButton();
   saveBoardState();
+}
+
+function openDeleteColumnModal(columnId) {
+  currentColumnId = columnId;
+  const column = document.getElementById(columnId);
+  const tasks = column.querySelector(".tasks").children.length;
+  if (tasks > 0) {
+    const modal = document.getElementById("deleteColumnModal");
+    modal.style.display = "flex";
+  } else {
+    deleteColumn();
+  }
+}
+
+function closeDeleteColumnModal() {
+  const modal = document.getElementById("deleteColumnModal");
+  modal.style.display = "none";
+  currentColumnId = null;
+}
+
+function deleteColumn() {
+  if (currentColumnId) {
+    const column = document.getElementById(currentColumnId);
+    column.remove();
+    saveBoardState();
+    showNotification("Columna eliminada", "info");
+    closeDeleteColumnModal();
+  }
 }
 
 function scrollToLeft() {
@@ -250,7 +280,7 @@ function closeTaskModal() {
 }
 
 function saveTaskEdit() {
-  const input = document.getElementById("editTaskInput");
+  const input = document.getElementById("editedaTaskInput");
   const newText = input.value.trim();
   if (newText && currentTask) {
     currentTask.querySelector(".task-text").textContent = newText;
@@ -311,5 +341,11 @@ document.getElementById("editTaskModal").addEventListener("click", (e) => {
 document.getElementById("editColumnModal").addEventListener("click", (e) => {
   if (e.target === e.currentTarget) {
     closeColumnModal();
+  }
+});
+
+document.getElementById("deleteColumnModal").addEventListener("click", (e) => {
+  if (e.target === e.currentTarget) {
+    closeDeleteColumnModal();
   }
 });
