@@ -54,8 +54,8 @@ body {
   background-color: #2c2c2c;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  width: 300px;
-  min-width: 300px;
+  width: 320px;
+  min-width: 320px;
   height: 500px; /* Altura fija */
   padding: 15px;
   box-sizing: border-box;
@@ -122,6 +122,7 @@ body {
   flex-grow: 1; /* Ocupa el espacio restante */
   overflow-y: auto;
   margin-bottom: 10px;
+  padding: 5px; /* Añadido para espacio extra en hover */
 }
 
 /* Personalizar la barra de desplazamiento vertical */
@@ -148,7 +149,7 @@ body {
   border: 1px solid #555555;
   border-radius: 4px;
   padding: 10px;
-  margin-bottom: 10px;
+  margin-bottom: 8px; /* Reducido de 10px */
   cursor: pointer;
   transition: transform 0.2s;
   position: relative;
@@ -169,7 +170,7 @@ body {
 
 .task-text {
   flex-grow: 1;
-  max-width: 180px; /* Consistente con tareas */
+  max-width: 210px; /* Aumentado de 200px */
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -437,9 +438,9 @@ body {
 
 @media (max-width: 768px) {
   .column {
-    width: 280px;
-    min-width: 280px;
-    height: 500px; /* Mantener altura fija en pantallas pequeñas */
+    width: 300px;
+    min-width: 300px;
+    height: 500px; /* Mantener altura fija */
   }
 
   .notification {
@@ -463,6 +464,6 @@ body {
   }
 
   .task-text {
-    max-width: 160px; /* Ajuste para pantallas pequeñas */
+    max-width: 190px; /* Aumentado de 180px */
   }
 }
