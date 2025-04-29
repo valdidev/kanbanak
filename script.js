@@ -8,7 +8,7 @@ function saveBoardState() {
   const columns = Array.from(board.getElementsByClassName("column")).map(
     (column) => ({
       id: column.id,
-      title: column.querySelector(".column-header").textContent,
+      title: column.querySelector(".column-title").textContent,
       tasks: Array.from(column.querySelector(".tasks").children).map(
         (task) => task.querySelector(".task-text").textContent
       ),
@@ -43,8 +43,9 @@ function createColumn(columnId, title, tasks) {
   column.id = columnId;
   column.draggable = true;
   column.innerHTML = `
-        <div class="column-header" onclick="openColumnEditModal('${columnId}')">${title}
-            <button class="delete-column-btn" onclick="event.stopPropagation(); openDeleteColumnModal('${columnId}')">X</button>
+        <div class="column-header" onclick="openColumnEditModal('${columnId}')">
+            <span class="column-title">${title}</span>
+            <button class="delete-column-btn" onclick="event.stopPropagation(); openDeleteColumnModal('${columnId}')">Eliminar</button>
         </div>
         <input type="text" class="task-input" placeholder="Nueva tarea..." onkeydown="if(event.key === 'Enter') addTask('${columnId}')">
         <button class="add-task" onclick="addTask('${columnId}')">Añadir Tarea</button>
@@ -322,7 +323,7 @@ function openColumnEditModal(columnId) {
   const modal = document.getElementById("editColumnModal");
   const input = document.getElementById("editColumnInput");
   const column = document.getElementById(columnId);
-  input.value = column.querySelector(".column-header").textContent;
+  input.value = column.querySelector(".column-title").textContent;
   modal.style.display = "flex";
   input.focus();
 }
@@ -338,7 +339,7 @@ function saveColumnEdit() {
   const newText = input.value.trim();
   if (newText && currentColumnId) {
     const column = document.getElementById(currentColumnId);
-    column.querySelector(".column-header").textContent = newText;
+    column.querySelector(".column-title").textContent = newText;
     saveBoardState();
   }
   closeColumnModal();
