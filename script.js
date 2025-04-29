@@ -102,7 +102,7 @@ function createTask(column, taskText) {
     openTaskEditModal(task);
   });
 
-  column.querySelector(".tasks").appendChild(task);
+  column.querySelector(".tasks").prepend(task);
 }
 
 function duplicateTask(button) {

@@ -17,12 +17,12 @@
     <div class="modal" id="editTaskModal">
       <div class="modal-content">
         <div class="modal-header">Editar Tarea</div>
-        <input
-          type="text"
+        <textarea
           class="modal-input"
           id="editTaskInput"
-          onkeydown="if(event.key === 'Enter') saveTaskEdit()"
-        />
+          rows="4"
+          onkeydown="if(event.key === 'Enter' && !event.shiftKey) {event.preventDefault(); saveTaskEdit();}"
+        ></textarea>
         <div class="modal-buttons">
           <button class="save-btn" onclick="saveTaskEdit()">Guardar</button>
           <button class="cancel-btn" onclick="closeTaskModal()">

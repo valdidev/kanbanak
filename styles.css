@@ -104,6 +104,10 @@ body {
 
 .task-text {
   flex-grow: 1;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .duplicate-btn {
@@ -226,6 +230,7 @@ body {
   box-sizing: border-box;
   background-color: #3a3a3a;
   color: #e5e7eb;
+  resize: vertical;
 }
 
 .modal-buttons {
