@@ -8,7 +8,23 @@
   </head>
   <body>
     <div class="kanban-container" id="kanbanContainer">
-      <div class="kanban-board" id="kanbanBoard"></div>
+      <div class="kanban-board" id="kanbanBoard">
+        <!-- Columnas y botón + se generan dinámicamente -->
+      </div>
+      <button
+        class="scroll-btn scroll-left"
+        id="scrollLeftBtn"
+        onclick="scrollToLeft()"
+      >
+        &lt;
+      </button>
+      <button
+        class="scroll-btn scroll-right"
+        id="scrollRightBtn"
+        onclick="scrollToRight()"
+      >
+        &gt;
+      </button>
     </div>
 
     <div class="modal" id="editTaskModal">

@@ -143,6 +143,22 @@ function addNewColumn() {
   saveBoardState();
 }
 
+function scrollToLeft() {
+  const container = document.getElementById("kanbanContainer");
+  container.scrollTo({
+    left: 0,
+    behavior: "smooth",
+  });
+}
+
+function scrollToRight() {
+  const container = document.getElementById("kanbanContainer");
+  container.scrollTo({
+    left: container.scrollWidth - container.clientWidth,
+    behavior: "smooth",
+  });
+}
+
 function startAutoScroll(e) {
   handleAutoScroll(e);
   scrollInterval = setInterval(() => handleAutoScroll(e), 50);
