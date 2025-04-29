@@ -1,214 +1,215 @@
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f0f2f5;
-    margin: 0;
-    padding: 20px;
+  font-family: Arial, sans-serif;
+  background-color: #f0f2f5;
+  margin: 0;
+  padding: 20px;
 }
 
 .kanban-container {
-    max-width: 100%;
-    overflow-x: auto;
-    padding-bottom: 10px;
-    scroll-behavior: smooth;
+  max-width: 100%;
+  overflow-x: auto;
+  padding-bottom: 10px;
+  scroll-behavior: smooth;
 }
 
 .kanban-board {
-    display: flex;
-    gap: 20px;
-    flex-wrap: nowrap;
-    padding: 10px;
+  display: flex;
+  gap: 20px;
+  flex-wrap: nowrap;
+  padding: 10px;
 }
 
 .column {
-    background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    width: 300px;
-    min-width: 300px;
-    padding: 15px;
-    min-height: 500px;
-    box-sizing: border-box;
-    cursor: move;
-    transition: transform 0.2s;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 300px;
+  min-width: 300px;
+  padding: 15px;
+  min-height: 500px;
+  box-sizing: border-box;
+  cursor: move;
+  transition: transform 0.2s;
 }
 
 .column.dragging {
-    opacity: 0.5;
-    transform: scale(0.98);
+  opacity: 0.5;
+  transform: scale(0.98);
 }
 
 .column-header {
-    background-color: #007bff;
-    color: white;
-    padding: 10px;
-    border-radius: 4px;
-    text-align: center;
-    margin-bottom: 15px;
-    font-size: 1.2em;
-    cursor: pointer;
+  background-color: #007bff;
+  color: white;
+  padding: 10px;
+  border-radius: 4px;
+  text-align: center;
+  margin-bottom: 15px;
+  font-size: 1.2em;
+  cursor: pointer;
 }
 
 .column-header:hover {
-    background-color: #0056b3;
+  background-color: #0056b3;
 }
 
 .task {
-    background-color: #f8f9fa;
-    border: 1px solid #dee2e6;
-    border-radius: 4px;
-    padding: 10px;
-    margin-bottom: 10px;
-    cursor: pointer;
-    transition: transform 0.2s;
-    position: relative;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  padding: 10px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: transform 0.2s;
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .task:hover {
-    transform: scale(1.02);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transform: scale(1.02);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .task.dragging {
-    opacity: 0.5;
+  opacity: 0.5;
 }
 
 .task-text {
-    flex-grow: 1;
+  flex-grow: 1;
 }
 
 .duplicate-btn {
-    display: none;
-    background-color: #6c757d;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    padding: 4px 8px;
-    font-size: 0.8em;
-    cursor: pointer;
+  display: none;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 0.8em;
+  cursor: pointer;
 }
 
 .task:hover .duplicate-btn {
-    display: inline-block;
+  display: inline-block;
 }
 
 .duplicate-btn:hover {
-    background-color: #5a6268;
+  background-color: #5a6268;
 }
 
 .add-task {
-    width: 100%;
-    padding: 8px;
-    border: none;
-    border-radius: 4px;
-    background-color: #28a745;
-    color: white;
-    cursor: pointer;
-    margin-top: 10px;
+  width: 100%;
+  padding: 8px;
+  border: none;
+  border-radius: 4px;
+  background-color: #28a745;
+  color: white;
+  cursor: pointer;
+  margin-top: 10px;
 }
 
 .add-task:hover {
-    background-color: #218838;
+  background-color: #218838;
 }
 
 .task-input {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 10px;
-    border: 1px solid #dee2e6;
-    border-radius: 4px;
-    box-sizing: border-box;
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  box-sizing: border-box;
 }
 
 .add-column-btn {
-    display: block;
-    margin: 0 auto 20px;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    background-color: #ffc107;
-    color: #333;
-    font-size: 1em;
-    cursor: pointer;
+  display: block;
+  margin: 0 auto 20px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  background-color: #ffc107;
+  color: #333;
+  font-size: 1em;
+  cursor: pointer;
 }
 
 .add-column-btn:hover {
-    background-color: #e0a800;
+  background-color: #e0a800;
 }
 
 .modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.5);
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
 }
 
 .modal-content {
-    background-color: #ffffff;
-    padding: 20px;
-    border-radius: 8px;
-    width: 90%;
-    max-width: 500px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .modal-header {
-    font-size: 1.2em;
-    margin-bottom: 15px;
-    color: #333;
+  font-size: 1.2em;
+  margin-bottom: 15px;
+  color: #333;
 }
 
 .modal-input {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #dee2e6;
-    border-radius: 4px;
-    box-sizing: border-box;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  box-sizing: border-box;
 }
 
 .modal-buttons {
-    display: flex;
-    gap: 10px;
-    justify-content: flex-end;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
 }
 
-.save-btn, .cancel-btn {
-    padding: 8px 16px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+.save-btn,
+.cancel-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
 .save-btn {
-    background-color: #007bff;
-    color: white;
+  background-color: #007bff;
+  color: white;
 }
 
 .save-btn:hover {
-    background-color: #0056b3;
+  background-color: #0056b3;
 }
 
 .cancel-btn {
-    background-color: #dc3545;
-    color: white;
+  background-color: #dc3545;
+  color: white;
 }
 
 .cancel-btn:hover {
-    background-color: #c82333;
+  background-color: #c82333;
 }
 
 @media (max-width: 768px) {
-    .column {
-        width: 280px;
-        min-width: 280px;
-    }
+  .column {
+    width: 280px;
+    min-width: 280px;
+  }
 }

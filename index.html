@@ -1,39 +1,55 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Aplicación Kanban</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <button class="add-column-btn" onclick="addNewColumn()">Añadir Nueva Columna</button>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <button class="add-column-btn" onclick="addNewColumn()">
+      Añadir Nueva Columna
+    </button>
     <div class="kanban-container" id="kanbanContainer">
-        <div class="kanban-board" id="kanbanBoard"></div>
+      <div class="kanban-board" id="kanbanBoard"></div>
     </div>
 
     <div class="modal" id="editTaskModal">
-        <div class="modal-content">
-            <div class="modal-header">Editar Tarea</div>
-            <input type="text" class="modal-input" id="editTaskInput" onkeydown="if(event.key === 'Enter') saveTaskEdit()">
-            <div class="modal-buttons">
-                <button class="save-btn" onclick="saveTaskEdit()">Guardar</button>
-                <button class="cancel-btn" onclick="closeTaskModal()">Cancelar</button>
-            </div>
+      <div class="modal-content">
+        <div class="modal-header">Editar Tarea</div>
+        <input
+          type="text"
+          class="modal-input"
+          id="editTaskInput"
+          onkeydown="if(event.key === 'Enter') saveTaskEdit()"
+        />
+        <div class="modal-buttons">
+          <button class="save-btn" onclick="saveTaskEdit()">Guardar</button>
+          <button class="cancel-btn" onclick="closeTaskModal()">
+            Cancelar
+          </button>
         </div>
+      </div>
     </div>
 
     <div class="modal" id="editColumnModal">
-        <div class="modal-content">
-            <div class="modal-header">Editar Título de Columna</div>
-            <input type="text" class="modal-input" id="editColumnInput" onkeydown="if(event.key === 'Enter') saveColumnEdit()">
-            <div class="modal-buttons">
-                <button class="save-btn" onclick="saveColumnEdit()">Guardar</button>
-                <button class="cancel-btn" onclick="closeColumnModal()">Cancelar</button>
-            </div>
+      <div class="modal-content">
+        <div class="modal-header">Editar Título de Columna</div>
+        <input
+          type="text"
+          class="modal-input"
+          id="editColumnInput"
+          onkeydown="if(event.key === 'Enter') saveColumnEdit()"
+        />
+        <div class="modal-buttons">
+          <button class="save-btn" onclick="saveColumnEdit()">Guardar</button>
+          <button class="cancel-btn" onclick="closeColumnModal()">
+            Cancelar
+          </button>
         </div>
+      </div>
     </div>
 
     <script src="script.js"></script>
-</body>
+  </body>
 </html>
