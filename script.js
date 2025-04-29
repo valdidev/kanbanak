@@ -18,37 +18,35 @@ function saveBoardState() {
 }
 
 function loadBoardState() {
-  const savedBoard = localStorage.getItem("kanbanBoard");
-  if (savedBoard) {
-    const columns = JSON.parse(savedBoard);
-    columnCount = columns.reduce((max, col) => {
-      const num = parseInt(col.id.split("-")[1] || 0);
-      return Math.max(max, num);
-    }, 0);
-    columns.forEach((col) => {
-      createColumn(col.id, col.title, col.tasks);
-    });
-  } else {
-    createColumn("todo", "Por Hacer", []);
-    createColumn("in-progress", "En Progreso", []);
-    createColumn("done", "Hecho", []);
-    columnCount = 3;
-  }
+  // Limpiar localStorage para evitar conflictos con datos antiguos
+  localStorage.removeItem("kanbanBoard");
+  columnCount = 0;
+  // Crear columnas iniciales con IDs únicos
+  createColumn("column-1", "Por Hacer", []);
+  createColumn("column-2", "En Progreso", []);
+  createColumn("column-3", "Hecho", []);
+  columnCount = 3;
   createAddColumnButton();
 }
 
 function createColumn(columnId, title, tasks) {
+  // Validar que el columnId no exista
+  if (document.getElementById(columnId)) {
+    console.error("ID de columna duplicado:", columnId);
+    return;
+  }
+  console.log("Creando columna con ID:", columnId); // Depuración
   const column = document.createElement("div");
   column.className = "column";
   column.id = columnId;
   column.draggable = true;
   column.innerHTML = `
-        <div class="column-header" onclick="openColumnEditModal('${columnId}')">
+        <div class="column-header">
             <span class="column-title">${title}</span>
-            <button class="delete-column-btn" onclick="event.stopPropagation(); openDeleteColumnModal('${columnId}')">Eliminar</button>
+            <button class="delete-column-btn">Eliminar</button>
         </div>
-        <input type="text" class="task-input" placeholder="Nueva tarea..." onkeydown="if(event.key === 'Enter') addTask('${columnId}')">
-        <button class="add-task" onclick="addTask('${columnId}')">Añadir Tarea</button>
+        <input type="text" class="task-input" placeholder="Nueva tarea...">
+        <button class="add-task">Añadir Tarea</button>
         <div class="tasks"></div>
     `;
   const board = document.getElementById("kanbanBoard");
@@ -58,6 +56,35 @@ function createColumn(columnId, title, tasks) {
   } else {
     board.appendChild(column);
   }
+
+  // Configurar eventos dinámicos
+  const columnHeader = column.querySelector(".column-header");
+  const deleteColumnBtn = column.querySelector(".delete-column-btn");
+  const taskInput = column.querySelector(".task-input");
+  const addTaskBtn = column.querySelector(".add-task");
+
+  columnHeader.addEventListener("click", () => {
+    console.log("Clic en column-header, columnId:", columnId); // Depuración
+    openColumnEditModal(columnId);
+  });
+
+  deleteColumnBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    console.log("Clic en delete-column-btn, columnId:", columnId); // Depuración
+    openDeleteColumnModal(columnId);
+  });
+
+  taskInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      console.log("Enter en task-input, columnId:", columnId); // Depuración
+      addTask(columnId);
+    }
+  });
+
+  addTaskBtn.addEventListener("click", () => {
+    console.log("Clic en add-task, columnId:", columnId); // Depuración
+    addTask(columnId);
+  });
 
   tasks.forEach((taskText) => createTask(column, taskText));
   setupColumnEvents(column);
@@ -76,7 +103,12 @@ function createAddColumnButton() {
 }
 
 function addTask(columnId) {
+  console.log("addTask llamado con columnId:", columnId); // Depuración
   const column = document.getElementById(columnId);
+  if (!column) {
+    console.error("No se encontró la columna con ID:", columnId);
+    return;
+  }
   const input = column.querySelector(".task-input");
   const taskText = input.value.trim();
 
@@ -148,14 +180,20 @@ function duplicateTask(button) {
 function addNewColumn() {
   columnCount++;
   const columnId = `column-${columnCount}`;
+  console.log("Creando nueva columna con ID:", columnId); // Depuración
   createColumn(columnId, "Nueva Columna", []);
   createAddColumnButton();
   saveBoardState();
 }
 
 function openDeleteColumnModal(columnId) {
+  console.log("openDeleteColumnModal llamado con columnId:", columnId); // Depuración
   currentColumnId = columnId;
   const column = document.getElementById(columnId);
+  if (!column) {
+    console.error("No se encontró la columna con ID:", columnId);
+    return;
+  }
   const tasks = column.querySelector(".tasks").children.length;
   if (tasks > 0) {
     const modal = document.getElementById("deleteColumnModal");
@@ -174,6 +212,10 @@ function closeDeleteColumnModal() {
 function deleteColumn() {
   if (currentColumnId) {
     const column = document.getElementById(currentColumnId);
+    if (!column) {
+      console.error("No se encontró la columna con ID:", currentColumnId);
+      return;
+    }
     column.remove();
     saveBoardState();
     showNotification("Columna eliminada", "info");
@@ -319,10 +361,15 @@ function saveTaskEdit() {
 }
 
 function openColumnEditModal(columnId) {
+  console.log("openColumnEditModal llamado con columnId:", columnId); // Depuración
   currentColumnId = columnId;
   const modal = document.getElementById("editColumnModal");
   const input = document.getElementById("editColumnInput");
   const column = document.getElementById(columnId);
+  if (!column) {
+    console.error("No se encontró la columna con ID:", columnId);
+    return;
+  }
   input.value = column.querySelector(".column-title").textContent;
   modal.style.display = "flex";
   input.focus();
@@ -335,11 +382,16 @@ function closeColumnModal() {
 }
 
 function saveColumnEdit() {
+  console.log("saveColumnEdit llamado con currentColumnId:", currentColumnId); // Depuración
   const input = document.getElementById("editColumnInput");
   const newText = input.value.trim();
   if (newText && currentColumnId) {
     if (newText.length <= 25) {
       const column = document.getElementById(currentColumnId);
+      if (!column) {
+        console.error("No se encontró la columna con ID:", currentColumnId);
+        return;
+      }
       column.querySelector(".column-title").textContent = newText;
       saveBoardState();
       closeColumnModal();
