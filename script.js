@@ -148,7 +148,7 @@ function duplicateTask(button) {
 function addNewColumn() {
   columnCount++;
   const columnId = `column-${columnCount}`;
-  createColumn(columnId, `Columna ${columnCount}`, []);
+  createColumn(columnId, "Nueva Columna", []);
   createAddColumnButton();
   saveBoardState();
 }
