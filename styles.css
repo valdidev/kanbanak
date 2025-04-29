@@ -43,7 +43,8 @@ body {
   display: flex;
   gap: 20px;
   flex-wrap: nowrap;
-  padding: 10px;
+  padding: 10px 10px 10px 10px;
+  padding-right: 80px; /* Espacio adicional para el botón + */
   align-items: flex-start;
   position: relative;
   min-width: fit-content; /* Asegura que el contenido no se comprima */
@@ -218,7 +219,7 @@ body {
   align-items: center;
   cursor: pointer;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  margin-left: 20px;
+  margin: 0 20px; /* Aire a los lados */
   align-self: center;
 }
 
@@ -358,6 +359,10 @@ body {
   }
 
   .add-column-btn {
-    margin-left: 10px;
+    margin: 0 10px;
+  }
+
+  .kanban-board {
+    padding-right: 60px; /* Menos espacio en pantallas pequeñas */
   }
 }
