@@ -60,6 +60,7 @@ function addTask(columnId) {
     createTask(column, taskText);
     input.value = "";
     saveBoardState();
+    showNotification("Tarea creada exitosamente", "success");
   } else {
     input.classList.add("shake");
     setTimeout(() => {
@@ -110,6 +111,7 @@ function duplicateTask(button) {
   const taskText = task.querySelector(".task-text").textContent;
   createTask(column, taskText);
   saveBoardState();
+  showNotification("Tarea duplicada", "info");
 }
 
 function addNewColumn() {
@@ -243,6 +245,18 @@ function saveColumnEdit() {
     saveBoardState();
   }
   closeColumnModal();
+}
+
+function showNotification(message, type) {
+  const container = document.getElementById("notificationContainer");
+  const notification = document.createElement("div");
+  notification.className = `notification ${type}`;
+  notification.textContent = message;
+  container.appendChild(notification);
+
+  setTimeout(() => {
+    notification.remove();
+  }, 3000);
 }
 
 // Cargar el estado del tablero al iniciar
