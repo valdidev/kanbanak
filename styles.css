@@ -18,6 +18,8 @@ body {
   gap: 20px;
   flex-wrap: nowrap;
   padding: 10px;
+  align-items: flex-start;
+  position: relative;
 }
 
 .column {
@@ -177,15 +179,20 @@ body {
 }
 
 .add-column-btn {
-  display: block;
-  margin: 0 auto 20px;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 4px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
   background-color: #854d0e;
   color: #e5e7eb;
-  font-size: 1em;
+  border: none;
+  font-size: 1.5em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  margin-left: 20px;
+  align-self: center;
 }
 
 .add-column-btn:hover {
@@ -321,5 +328,9 @@ body {
 
   .notification {
     max-width: 90%;
+  }
+
+  .add-column-btn {
+    margin-left: 10px;
   }
 }

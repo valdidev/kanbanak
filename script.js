@@ -5,13 +5,15 @@ let scrollInterval = null;
 
 function saveBoardState() {
   const board = document.getElementById("kanbanBoard");
-  const columns = Array.from(board.children).map((column) => ({
-    id: column.id,
-    title: column.querySelector(".column-header").textContent,
-    tasks: Array.from(column.querySelector(".tasks").children).map(
-      (task) => task.querySelector(".task-text").textContent
-    ),
-  }));
+  const columns = Array.from(board.getElementsByClassName("column")).map(
+    (column) => ({
+      id: column.id,
+      title: column.querySelector(".column-header").textContent,
+      tasks: Array.from(column.querySelector(".tasks").children).map(
+        (task) => task.querySelector(".task-text").textContent
+      ),
+    })
+  );
   localStorage.setItem("kanbanBoard", JSON.stringify(columns));
 }
 
@@ -32,6 +34,7 @@ function loadBoardState() {
     createColumn("done", "Hecho", []);
     columnCount = 3;
   }
+  createAddColumnButton();
 }
 
 function createColumn(columnId, title, tasks) {
@@ -45,10 +48,28 @@ function createColumn(columnId, title, tasks) {
         <button class="add-task" onclick="addTask('${columnId}')">Añadir Tarea</button>
         <div class="tasks"></div>
     `;
-  document.getElementById("kanbanBoard").appendChild(column);
+  const board = document.getElementById("kanbanBoard");
+  const addColumnBtn = document.getElementById("addColumnBtn");
+  if (addColumnBtn) {
+    board.insertBefore(column, addColumnBtn);
+  } else {
+    board.appendChild(column);
+  }
 
   tasks.forEach((taskText) => createTask(column, taskText));
   setupColumnEvents(column);
+}
+
+function createAddColumnButton() {
+  const existingBtn = document.getElementById("addColumnBtn");
+  if (existingBtn) existingBtn.remove();
+
+  const button = document.createElement("button");
+  button.id = "addColumnBtn";
+  button.className = "add-column-btn";
+  button.textContent = "+";
+  button.onclick = addNewColumn;
+  document.getElementById("kanbanBoard").appendChild(button);
 }
 
 function addTask(columnId) {
@@ -118,6 +139,7 @@ function addNewColumn() {
   columnCount++;
   const columnId = `column-${columnCount}`;
   createColumn(columnId, `Columna ${columnCount}`, []);
+  createAddColumnButton();
   saveBoardState();
 }
 
@@ -183,7 +205,7 @@ function setupColumnEvents(column) {
     const draggingColumn = document.querySelector(".column.dragging");
     if (draggingColumn && draggingColumn !== column) {
       const board = document.getElementById("kanbanBoard");
-      const allColumns = Array.from(board.children);
+      const allColumns = Array.from(board.getElementsByClassName("column"));
       const currentIndex = allColumns.indexOf(column);
       const draggingIndex = allColumns.indexOf(draggingColumn);
       if (currentIndex < draggingIndex) {
@@ -191,6 +213,7 @@ function setupColumnEvents(column) {
       } else {
         board.insertBefore(draggingColumn, column.nextSibling);
       }
+      saveBoardState();
     }
   });
 }
