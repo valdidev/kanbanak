@@ -99,7 +99,10 @@ function createTask(column, taskText) {
   task.draggable = true;
   task.innerHTML = `
         <span class="task-text">${taskText}</span>
-        <button class="duplicate-btn" onclick="duplicateTask(this)">Duplicar</button>
+        <div class="task-buttons">
+            <button class="duplicate-btn" onclick="duplicateTask(this)">Duplicar</button>
+            <button class="delete-task-btn" onclick="openDeleteTaskModal(this)">Eliminar</button>
+        </div>
     `;
 
   task.addEventListener("dragstart", (e) => {
@@ -120,7 +123,11 @@ function createTask(column, taskText) {
   });
 
   task.addEventListener("click", (e) => {
-    if (e.target.classList.contains("duplicate-btn")) return;
+    if (
+      e.target.classList.contains("duplicate-btn") ||
+      e.target.classList.contains("delete-task-btn")
+    )
+      return;
     e.stopPropagation();
     openTaskEditModal(task);
   });
@@ -170,6 +177,27 @@ function deleteColumn() {
     saveBoardState();
     showNotification("Columna eliminada", "info");
     closeDeleteColumnModal();
+  }
+}
+
+function openDeleteTaskModal(button) {
+  currentTask = button.closest(".task");
+  const modal = document.getElementById("deleteTaskModal");
+  modal.style.display = "flex";
+}
+
+function closeDeleteTaskModal() {
+  const modal = document.getElementById("deleteTaskModal");
+  modal.style.display = "none";
+  currentTask = null;
+}
+
+function deleteTask() {
+  if (currentTask) {
+    currentTask.remove();
+    saveBoardState();
+    showNotification("Tarea eliminada", "info");
+    closeDeleteTaskModal();
   }
 }
 
@@ -280,7 +308,7 @@ function closeTaskModal() {
 }
 
 function saveTaskEdit() {
-  const input = document.getElementById("editedaTaskInput");
+  const input = document.getElementById("editTaskInput");
   const newText = input.value.trim();
   if (newText && currentTask) {
     currentTask.querySelector(".task-text").textContent = newText;
@@ -347,5 +375,11 @@ document.getElementById("editColumnModal").addEventListener("click", (e) => {
 document.getElementById("deleteColumnModal").addEventListener("click", (e) => {
   if (e.target === e.currentTarget) {
     closeDeleteColumnModal();
+  }
+});
+
+document.getElementById("deleteTaskModal").addEventListener("click", (e) => {
+  if (e.target === e.currentTarget) {
+    closeDeleteTaskModal();
   }
 });

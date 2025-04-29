@@ -79,6 +79,19 @@
       </div>
     </div>
 
+    <div class="modal" id="deleteTaskModal">
+      <div class="modal-content">
+        <div class="modal-header">Confirmar Eliminación</div>
+        <p>¿Estás seguro de que quieres eliminar esta tarea?</p>
+        <div class="modal-buttons">
+          <button class="save-btn" onclick="deleteTask()">Eliminar</button>
+          <button class="cancel-btn" onclick="closeDeleteTaskModal()">
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </div>
+
     <div class="notification-container" id="notificationContainer"></div>
 
     <script src="script.js"></script>
