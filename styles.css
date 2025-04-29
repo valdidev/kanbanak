@@ -53,6 +53,31 @@ body {
   background-color: #3b82f6;
 }
 
+.tasks {
+  max-height: 400px;
+  overflow-y: auto;
+  margin-bottom: 10px;
+}
+
+/* Personalizar la barra de desplazamiento */
+.tasks::-webkit-scrollbar {
+  width: 8px;
+}
+
+.tasks::-webkit-scrollbar-track {
+  background: #2c2c2c;
+  border-radius: 4px;
+}
+
+.tasks::-webkit-scrollbar-thumb {
+  background: #4b5563;
+  border-radius: 4px;
+}
+
+.tasks::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
 .task {
   background-color: #3a3a3a;
   border: 1px solid #555555;
