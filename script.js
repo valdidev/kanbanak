@@ -60,6 +60,12 @@ function addTask(columnId) {
     createTask(column, taskText);
     input.value = "";
     saveBoardState();
+  } else {
+    input.classList.add("shake");
+    setTimeout(() => {
+      input.classList.remove("shake");
+      input.style.borderColor = "";
+    }, 300);
   }
 }
 
