@@ -338,11 +338,17 @@ function saveColumnEdit() {
   const input = document.getElementById("editColumnInput");
   const newText = input.value.trim();
   if (newText && currentColumnId) {
-    const column = document.getElementById(currentColumnId);
-    column.querySelector(".column-title").textContent = newText;
-    saveBoardState();
+    if (newText.length <= 25) {
+      const column = document.getElementById(currentColumnId);
+      column.querySelector(".column-title").textContent = newText;
+      saveBoardState();
+      closeColumnModal();
+    } else {
+      showNotification("El título no puede exceder 25 caracteres", "info");
+    }
+  } else {
+    showNotification("El título no puede estar vacío", "info");
   }
-  closeColumnModal();
 }
 
 function showNotification(message, type) {
