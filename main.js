@@ -4,6 +4,7 @@ import {
   createAddColumnButton,
   createInitialColumns,
   addNewColumn,
+  copyTasksToClipboard,
 } from "./board.js";
 import { addTask, createTask, duplicateTask } from "./tasks.js";
 import {
@@ -25,6 +26,7 @@ import {
   scrollToRight,
   startAutoScroll,
   stopAutoScroll,
+  handleAutoScroll,
   setupColumnEvents,
 } from "./scroll.js";
 import { showNotification } from "./notifications.js";
@@ -35,6 +37,7 @@ window.createColumn = createColumn;
 window.createAddColumnButton = createAddColumnButton;
 window.createInitialColumns = createInitialColumns;
 window.addNewColumn = addNewColumn;
+window.copyTasksToClipboard = copyTasksToClipboard;
 window.addTask = addTask;
 window.createTask = createTask;
 window.duplicateTask = duplicateTask;
@@ -54,6 +57,7 @@ window.scrollToLeft = scrollToLeft;
 window.scrollToRight = scrollToRight;
 window.startAutoScroll = startAutoScroll;
 window.stopAutoScroll = stopAutoScroll;
+window.handleAutoScroll = handleAutoScroll;
 window.setupColumnEvents = setupColumnEvents;
 window.showNotification = showNotification;
 window.columnCount = 0;

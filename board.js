@@ -19,14 +19,15 @@ function createColumn(columnId, title, tasks) {
   column.id = columnId;
   column.draggable = true;
   column.innerHTML = `
-      <div class="column-header">
-        <span class="column-title">${title}</span>
-        <button class="delete-column-btn">Eliminar</button>
-      </div>
-      <input type="text" class="task-input" placeholder="Nueva tarea...">
-      <button class="add-task">Añadir Tarea</button>
-      <div class="tasks"></div>
-    `;
+    <div class="column-header">
+      <button class="copy-tasks-btn" title="Copiar tareas">📋</button>
+      <span class="column-title">${title}</span>
+      <button class="delete-column-btn">Eliminar</button>
+    </div>
+    <input type="text" class="task-input" placeholder="Nueva tarea...">
+    <button class="add-task">Añadir Tarea</button>
+    <div class="tasks"></div>
+  `;
 
   const board = document.getElementById("kanbanBoard");
   const addColumnBtn = document.getElementById("addColumnBtn");
@@ -37,12 +38,23 @@ function createColumn(columnId, title, tasks) {
   }
 
   const columnHeader = column.querySelector(".column-header");
+  const copyTasksBtn = column.querySelector(".copy-tasks-btn");
   const deleteColumnBtn = column.querySelector(".delete-column-btn");
   const taskInput = column.querySelector(".task-input");
   const addTaskBtn = column.querySelector(".add-task");
 
-  columnHeader.addEventListener("click", () => {
-    openColumnEditModal(columnId);
+  columnHeader.addEventListener("click", (e) => {
+    if (
+      !e.target.classList.contains("copy-tasks-btn") &&
+      !e.target.classList.contains("delete-column-btn")
+    ) {
+      openColumnEditModal(columnId);
+    }
+  });
+
+  copyTasksBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    copyTasksToClipboard(columnId);
   });
 
   deleteColumnBtn.addEventListener("click", (e) => {
@@ -62,6 +74,30 @@ function createColumn(columnId, title, tasks) {
 
   tasks.forEach((taskText) => createTask(column, taskText));
   setupColumnEvents(column);
+}
+
+function copyTasksToClipboard(columnId) {
+  const column = document.getElementById(columnId);
+  if (!column) return;
+
+  const tasks = column.querySelectorAll(".task-text");
+  const taskList = Array.from(tasks)
+    .map((task, index) => `${index + 1}. ${task.textContent}`)
+    .join("\n");
+
+  if (taskList) {
+    navigator.clipboard
+      .writeText(taskList)
+      .then(() => {
+        showNotification("Tareas copiadas al portapapeles", "success");
+      })
+      .catch((err) => {
+        console.error("Error al copiar tareas:", err);
+        showNotification("Error al copiar tareas", "info");
+      });
+  } else {
+    showNotification("No hay tareas para copiar", "info");
+  }
 }
 
 function createAddColumnButton() {
@@ -89,4 +125,5 @@ export {
   createAddColumnButton,
   createInitialColumns,
   addNewColumn,
+  copyTasksToClipboard,
 };
