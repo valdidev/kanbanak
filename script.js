@@ -2,8 +2,191 @@ let currentTask = null;
 let currentColumnId = null;
 let columnCount = 0;
 let scrollInterval = null;
+let db = null;
+
+// Inicializar la base de datos SQLite
+async function initDatabase() {
+  try {
+    // Cargar SQL.js
+    const SQL = await initSqlJs({
+      locateFile: (file) =>
+        `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/${file}`,
+    });
+
+    // Verificar si hay una base de datos guardada
+    const savedDb = localStorage.getItem("kanbanDB");
+
+    if (savedDb) {
+      // Convertir el string guardado a Uint8Array
+      const buffer = new Uint8Array(savedDb.split(",").map(Number));
+      db = new SQL.Database(buffer);
+      console.log("Base de datos cargada desde localStorage");
+    } else {
+      // Crear nueva base de datos
+      db = new SQL.Database();
+      console.log("Nueva base de datos creada");
+
+      // Crear tablas
+      db.run(`
+        CREATE TABLE columns (
+          id TEXT PRIMARY KEY,
+          title TEXT NOT NULL,
+          position INTEGER NOT NULL
+        );
+      `);
+
+      db.run(`
+        CREATE TABLE tasks (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          column_id TEXT NOT NULL,
+          text TEXT NOT NULL,
+          position INTEGER NOT NULL,
+          FOREIGN KEY (column_id) REFERENCES columns(id) ON DELETE CASCADE
+        );
+      `);
+
+      // Crear columnas iniciales
+      db.run("INSERT INTO columns (id, title, position) VALUES (?, ?, ?);", [
+        "column-1",
+        "Por Hacer",
+        0,
+      ]);
+      db.run("INSERT INTO columns (id, title, position) VALUES (?, ?, ?);", [
+        "column-2",
+        "En Progreso",
+        1,
+      ]);
+      db.run("INSERT INTO columns (id, title, position) VALUES (?, ?, ?);", [
+        "column-3",
+        "Hecho",
+        2,
+      ]);
+
+      // Guardar la base de datos inicial
+      saveDatabase();
+    }
+
+    // Cargar los datos en la interfaz
+    loadFromDatabase();
+  } catch (err) {
+    console.error("Error al inicializar SQLite:", err);
+    // Fallback a localStorage
+    loadFromLocalStorage();
+  }
+}
+
+function saveDatabase() {
+  if (!db) return;
+
+  try {
+    // Exportar la base de datos a un array de bytes
+    const data = db.export();
+    // Convertir a string para guardar en localStorage
+    localStorage.setItem("kanbanDB", Array.from(data).join(","));
+    console.log("Base de datos guardada");
+  } catch (err) {
+    console.error("Error al guardar la base de datos:", err);
+  }
+}
 
 function saveBoardState() {
+  if (!db) {
+    saveToLocalStorage();
+    return;
+  }
+
+  try {
+    // Comenzar transacción
+    db.exec("BEGIN TRANSACTION;");
+
+    // Limpiar tablas
+    db.run("DELETE FROM tasks;");
+    db.run("DELETE FROM columns;");
+
+    // Guardar columnas
+    const columns = document.querySelectorAll(".column");
+    columns.forEach((column, index) => {
+      const columnId = column.id;
+      const title = column.querySelector(".column-title").textContent;
+
+      db.run("INSERT INTO columns (id, title, position) VALUES (?, ?, ?);", [
+        columnId,
+        title,
+        index,
+      ]);
+
+      // Guardar tareas
+      const tasks = column.querySelectorAll(".task");
+      tasks.forEach((task, taskIndex) => {
+        const taskText = task.querySelector(".task-text").textContent;
+        db.run(
+          "INSERT INTO tasks (column_id, text, position) VALUES (?, ?, ?);",
+          [columnId, taskText, taskIndex]
+        );
+      });
+    });
+
+    // Finalizar transacción
+    db.exec("COMMIT;");
+
+    // Guardar la base de datos
+    saveDatabase();
+  } catch (err) {
+    console.error("Error al guardar:", err);
+    db.exec("ROLLBACK;");
+    saveToLocalStorage();
+  }
+}
+
+function loadFromDatabase() {
+  if (!db) {
+    loadFromLocalStorage();
+    return;
+  }
+
+  try {
+    // Limpiar el tablero
+    const board = document.getElementById("kanbanBoard");
+    board.innerHTML = "";
+    columnCount = 0;
+
+    // Cargar columnas ordenadas por posición
+    const columnsQuery = db.exec("SELECT * FROM columns ORDER BY position;");
+
+    if (!columnsQuery.length || !columnsQuery[0].values.length) {
+      createInitialColumns();
+      return;
+    }
+
+    const columns = columnsQuery[0].values;
+
+    // Crear columnas
+    columns.forEach(([id, title, position]) => {
+      // Cargar tareas para esta columna
+      const tasks = [];
+      const stmt = db.prepare(
+        "SELECT text FROM tasks WHERE column_id = ? ORDER BY position;"
+      );
+      stmt.bind([id]);
+
+      while (stmt.step()) {
+        tasks.push(stmt.getAsObject().text);
+      }
+      stmt.free();
+
+      createColumn(id, title, tasks);
+      columnCount++;
+    });
+
+    createAddColumnButton();
+  } catch (err) {
+    console.error("Error al cargar desde SQLite:", err);
+    loadFromLocalStorage();
+  }
+}
+
+// Funciones de fallback a localStorage
+function saveToLocalStorage() {
   const board = document.getElementById("kanbanBoard");
   const columns = Array.from(board.getElementsByClassName("column")).map(
     (column) => ({
@@ -15,40 +198,61 @@ function saveBoardState() {
     })
   );
   localStorage.setItem("kanbanBoard", JSON.stringify(columns));
+  console.log("Datos guardados en localStorage");
 }
 
-function loadBoardState() {
-  // Limpiar localStorage para evitar conflictos con datos antiguos
-  localStorage.removeItem("kanbanBoard");
+function loadFromLocalStorage() {
+  const savedData = localStorage.getItem("kanbanBoard");
+  if (savedData) {
+    const columns = JSON.parse(savedData);
+    columnCount = 0;
+    const board = document.getElementById("kanbanBoard");
+    board.innerHTML = "";
+
+    columns.forEach((column) => {
+      createColumn(column.id, column.title, column.tasks);
+      columnCount++;
+    });
+
+    createAddColumnButton();
+    console.log("Datos cargados desde localStorage");
+  } else {
+    createInitialColumns();
+  }
+}
+
+function createInitialColumns() {
   columnCount = 0;
-  // Crear columnas iniciales con IDs únicos
   createColumn("column-1", "Por Hacer", []);
   createColumn("column-2", "En Progreso", []);
   createColumn("column-3", "Hecho", []);
   columnCount = 3;
   createAddColumnButton();
+  console.log("Columnas iniciales creadas");
 }
 
+// Resto de las funciones (sin cambios)
+
 function createColumn(columnId, title, tasks) {
-  // Validar que el columnId no exista
   if (document.getElementById(columnId)) {
     console.error("ID de columna duplicado:", columnId);
     return;
   }
-  console.log("Creando columna con ID:", columnId); // Depuración
+
   const column = document.createElement("div");
   column.className = "column";
   column.id = columnId;
   column.draggable = true;
   column.innerHTML = `
-        <div class="column-header">
-            <span class="column-title">${title}</span>
-            <button class="delete-column-btn">Eliminar</button>
-        </div>
-        <input type="text" class="task-input" placeholder="Nueva tarea...">
-        <button class="add-task">Añadir Tarea</button>
-        <div class="tasks"></div>
-    `;
+    <div class="column-header">
+      <span class="column-title">${title}</span>
+      <button class="delete-column-btn">Eliminar</button>
+    </div>
+    <input type="text" class="task-input" placeholder="Nueva tarea...">
+    <button class="add-task">Añadir Tarea</button>
+    <div class="tasks"></div>
+  `;
+
   const board = document.getElementById("kanbanBoard");
   const addColumnBtn = document.getElementById("addColumnBtn");
   if (addColumnBtn) {
@@ -57,32 +261,28 @@ function createColumn(columnId, title, tasks) {
     board.appendChild(column);
   }
 
-  // Configurar eventos dinámicos
+  // Configurar eventos
   const columnHeader = column.querySelector(".column-header");
   const deleteColumnBtn = column.querySelector(".delete-column-btn");
   const taskInput = column.querySelector(".task-input");
   const addTaskBtn = column.querySelector(".add-task");
 
   columnHeader.addEventListener("click", () => {
-    console.log("Clic en column-header, columnId:", columnId); // Depuración
     openColumnEditModal(columnId);
   });
 
   deleteColumnBtn.addEventListener("click", (e) => {
     e.stopPropagation();
-    console.log("Clic en delete-column-btn, columnId:", columnId); // Depuración
     openDeleteColumnModal(columnId);
   });
 
   taskInput.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
-      console.log("Enter en task-input, columnId:", columnId); // Depuración
       addTask(columnId);
     }
   });
 
   addTaskBtn.addEventListener("click", () => {
-    console.log("Clic en add-task, columnId:", columnId); // Depuración
     addTask(columnId);
   });
 
@@ -103,12 +303,9 @@ function createAddColumnButton() {
 }
 
 function addTask(columnId) {
-  console.log("addTask llamado con columnId:", columnId); // Depuración
   const column = document.getElementById(columnId);
-  if (!column) {
-    console.error("No se encontró la columna con ID:", columnId);
-    return;
-  }
+  if (!column) return;
+
   const input = column.querySelector(".task-input");
   const taskText = input.value.trim();
 
@@ -119,10 +316,7 @@ function addTask(columnId) {
     showNotification("Tarea creada exitosamente", "success");
   } else {
     input.classList.add("shake");
-    setTimeout(() => {
-      input.classList.remove("shake");
-      input.style.borderColor = "";
-    }, 300);
+    setTimeout(() => input.classList.remove("shake"), 300);
   }
 }
 
@@ -131,12 +325,12 @@ function createTask(column, taskText) {
   task.className = "task";
   task.draggable = true;
   task.innerHTML = `
-        <span class="task-text">${taskText}</span>
-        <div class="task-buttons">
-            <button class="duplicate-btn" onclick="duplicateTask(this)">Duplicar</button>
-            <button class="delete-task-btn" onclick="openDeleteTaskModal(this)">Eliminar</button>
-        </div>
-    `;
+    <span class="task-text">${taskText}</span>
+    <div class="task-buttons">
+      <button class="duplicate-btn" onclick="duplicateTask(this)">Duplicar</button>
+      <button class="delete-task-btn" onclick="openDeleteTaskModal(this)">Eliminar</button>
+    </div>
+  `;
 
   task.addEventListener("dragstart", (e) => {
     e.stopPropagation();
@@ -151,18 +345,16 @@ function createTask(column, taskText) {
     saveBoardState();
   });
 
-  task.addEventListener("drag", (e) => {
-    handleAutoScroll(e);
-  });
+  task.addEventListener("drag", handleAutoScroll);
 
   task.addEventListener("click", (e) => {
     if (
-      e.target.classList.contains("duplicate-btn") ||
-      e.target.classList.contains("delete-task-btn")
-    )
-      return;
-    e.stopPropagation();
-    openTaskEditModal(task);
+      !e.target.classList.contains("duplicate-btn") &&
+      !e.target.classList.contains("delete-task-btn")
+    ) {
+      e.stopPropagation();
+      openTaskEditModal(task);
+    }
   });
 
   column.querySelector(".tasks").prepend(task);
@@ -180,43 +372,31 @@ function duplicateTask(button) {
 function addNewColumn() {
   columnCount++;
   const columnId = `column-${columnCount}`;
-  console.log("Creando nueva columna con ID:", columnId); // Depuración
   createColumn(columnId, "Nueva Columna", []);
   createAddColumnButton();
   saveBoardState();
 }
 
 function openDeleteColumnModal(columnId) {
-  console.log("openDeleteColumnModal llamado con columnId:", columnId); // Depuración
   currentColumnId = columnId;
   const column = document.getElementById(columnId);
-  if (!column) {
-    console.error("No se encontró la columna con ID:", columnId);
-    return;
-  }
   const tasks = column.querySelector(".tasks").children.length;
+
   if (tasks > 0) {
-    const modal = document.getElementById("deleteColumnModal");
-    modal.style.display = "flex";
+    document.getElementById("deleteColumnModal").style.display = "flex";
   } else {
     deleteColumn();
   }
 }
 
 function closeDeleteColumnModal() {
-  const modal = document.getElementById("deleteColumnModal");
-  modal.style.display = "none";
+  document.getElementById("deleteColumnModal").style.display = "none";
   currentColumnId = null;
 }
 
 function deleteColumn() {
   if (currentColumnId) {
-    const column = document.getElementById(currentColumnId);
-    if (!column) {
-      console.error("No se encontró la columna con ID:", currentColumnId);
-      return;
-    }
-    column.remove();
+    document.getElementById(currentColumnId).remove();
     saveBoardState();
     showNotification("Columna eliminada", "info");
     closeDeleteColumnModal();
@@ -225,13 +405,11 @@ function deleteColumn() {
 
 function openDeleteTaskModal(button) {
   currentTask = button.closest(".task");
-  const modal = document.getElementById("deleteTaskModal");
-  modal.style.display = "flex";
+  document.getElementById("deleteTaskModal").style.display = "flex";
 }
 
 function closeDeleteTaskModal() {
-  const modal = document.getElementById("deleteTaskModal");
-  modal.style.display = "none";
+  document.getElementById("deleteTaskModal").style.display = "none";
   currentTask = null;
 }
 
@@ -245,8 +423,7 @@ function deleteTask() {
 }
 
 function scrollToLeft() {
-  const container = document.getElementById("kanbanContainer");
-  container.scrollTo({
+  document.getElementById("kanbanContainer").scrollTo({
     left: 0,
     behavior: "smooth",
   });
@@ -291,8 +468,7 @@ function setupColumnEvents(column) {
     e.preventDefault();
     const draggingTask = document.querySelector(".task.dragging");
     if (draggingTask) {
-      const tasksContainer = column.querySelector(".tasks");
-      tasksContainer.appendChild(draggingTask);
+      column.querySelector(".tasks").appendChild(draggingTask);
     }
   });
 
@@ -325,6 +501,7 @@ function setupColumnEvents(column) {
       const allColumns = Array.from(board.getElementsByClassName("column"));
       const currentIndex = allColumns.indexOf(column);
       const draggingIndex = allColumns.indexOf(draggingColumn);
+
       if (currentIndex < draggingIndex) {
         board.insertBefore(draggingColumn, column);
       } else {
@@ -345,8 +522,7 @@ function openTaskEditModal(task) {
 }
 
 function closeTaskModal() {
-  const modal = document.getElementById("editTaskModal");
-  modal.style.display = "none";
+  document.getElementById("editTaskModal").style.display = "none";
   currentTask = null;
 }
 
@@ -361,37 +537,26 @@ function saveTaskEdit() {
 }
 
 function openColumnEditModal(columnId) {
-  console.log("openColumnEditModal llamado con columnId:", columnId); // Depuración
   currentColumnId = columnId;
   const modal = document.getElementById("editColumnModal");
   const input = document.getElementById("editColumnInput");
   const column = document.getElementById(columnId);
-  if (!column) {
-    console.error("No se encontró la columna con ID:", columnId);
-    return;
-  }
   input.value = column.querySelector(".column-title").textContent;
   modal.style.display = "flex";
   input.focus();
 }
 
 function closeColumnModal() {
-  const modal = document.getElementById("editColumnModal");
-  modal.style.display = "none";
+  document.getElementById("editColumnModal").style.display = "none";
   currentColumnId = null;
 }
 
 function saveColumnEdit() {
-  console.log("saveColumnEdit llamado con currentColumnId:", currentColumnId); // Depuración
   const input = document.getElementById("editColumnInput");
   const newText = input.value.trim();
   if (newText && currentColumnId) {
     if (newText.length <= 25) {
       const column = document.getElementById(currentColumnId);
-      if (!column) {
-        console.error("No se encontró la columna con ID:", currentColumnId);
-        return;
-      }
       column.querySelector(".column-title").textContent = newText;
       saveBoardState();
       closeColumnModal();
@@ -410,35 +575,30 @@ function showNotification(message, type) {
   notification.textContent = message;
   container.appendChild(notification);
 
-  setTimeout(() => {
-    notification.remove();
-  }, 3000);
+  setTimeout(() => notification.remove(), 3000);
 }
 
-// Cargar el estado del tablero al iniciar
-loadBoardState();
+// Eventos del DOM
+document.addEventListener("DOMContentLoaded", () => {
+  // Configurar eventos para los modales
+  document.getElementById("editTaskModal").addEventListener("click", (e) => {
+    if (e.target === e.currentTarget) closeTaskModal();
+  });
 
-// Configurar eventos para los modales
-document.getElementById("editTaskModal").addEventListener("click", (e) => {
-  if (e.target === e.currentTarget) {
-    closeTaskModal();
-  }
-});
+  document.getElementById("editColumnModal").addEventListener("click", (e) => {
+    if (e.target === e.currentTarget) closeColumnModal();
+  });
 
-document.getElementById("editColumnModal").addEventListener("click", (e) => {
-  if (e.target === e.currentTarget) {
-    closeColumnModal();
-  }
-});
+  document
+    .getElementById("deleteColumnModal")
+    .addEventListener("click", (e) => {
+      if (e.target === e.currentTarget) closeDeleteColumnModal();
+    });
 
-document.getElementById("deleteColumnModal").addEventListener("click", (e) => {
-  if (e.target === e.currentTarget) {
-    closeDeleteColumnModal();
-  }
-});
+  document.getElementById("deleteTaskModal").addEventListener("click", (e) => {
+    if (e.target === e.currentTarget) closeDeleteTaskModal();
+  });
 
-document.getElementById("deleteTaskModal").addEventListener("click", (e) => {
-  if (e.target === e.currentTarget) {
-    closeDeleteTaskModal();
-  }
+  // Inicializar la aplicación
+  initDatabase();
 });
