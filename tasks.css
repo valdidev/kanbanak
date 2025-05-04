@@ -1,0 +1,140 @@
+.tasks {
+  flex-grow: 1; /* Ocupa el espacio restante */
+  overflow-y: auto;
+  margin-bottom: 10px;
+  padding: 5px; /* Añadido para espacio extra en hover */
+}
+
+/* Personalizar la barra de desplazamiento vertical */
+.tasks::-webkit-scrollbar {
+  width: 8px;
+}
+
+.tasks::-webkit-scrollbar-track {
+  background: #2c2c2c;
+  border-radius: 4px;
+}
+
+.tasks::-webkit-scrollbar-thumb {
+  background: #4b5563;
+  border-radius: 4px;
+}
+
+.tasks::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+.task {
+  background-color: #3a3a3a;
+  border: 1px solid #555555;
+  border-radius: 4px;
+  padding: 10px;
+  margin-bottom: 8px; /* Reducido de 10px */
+  cursor: pointer;
+  transition: transform 0.2s;
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #e5e7eb;
+}
+
+.task:hover {
+  transform: scale(1.02);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.task.dragging {
+  opacity: 0.5;
+}
+
+.task-text {
+  flex-grow: 1;
+  max-width: 210px; /* Aumentado de 200px */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.task .task-buttons {
+  display: none; /* Oculta por defecto */
+  flex-shrink: 0;
+  flex-direction: row;
+  gap: 5px;
+}
+
+.task:hover .task-buttons {
+  display: flex; /* Muestra solo en ungod */
+}
+
+.duplicate-btn,
+.delete-task-btn {
+  background-color: #4b5563;
+  color: #e5e7eb;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 0.8em;
+  cursor: pointer;
+}
+
+.delete-task-btn {
+  background-color: #991b1b;
+}
+
+.duplicate-btn:hover {
+  background-color: #6b7280;
+}
+
+.delete-task-btn:hover {
+  background-color: #dc2626;
+}
+
+.add-task {
+  width: 100%;
+  padding: 8px;
+  border: none;
+  border-radius: 4px;
+  background-color: #166534;
+  color: #e5e7eb;
+  cursor: pointer;
+  margin-top: 10px;
+  flex-shrink: 0;
+}
+
+.add-task:hover {
+  background-color: #22c55e;
+}
+
+.task-input {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #555555;
+  border-radius: 4px;
+  box-sizing: border-box;
+  background-color: #3a3a3a;
+  color: #e5e7eb;
+  flex-shrink: 0;
+}
+
+.task-input.shake {
+  animation: shake 0.3s ease-in-out;
+  border-color: #dc2626;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  50% {
+    transform: translateX(5px);
+  }
+  75% {
+    transform: translateX(-5px);
+  }
+}

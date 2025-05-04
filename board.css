@@ -1,0 +1,99 @@
+.kanban-board {
+  display: flex;
+  gap: 20px;
+  flex-wrap: nowrap;
+  padding: 10px 10px 10px 10px;
+  padding-right: 80px; /* Espacio adicional para el botón + */
+  align-items: flex-start;
+  position: relative;
+  min-width: fit-content; /* Asegura que el contenido no se comprima */
+}
+
+.column {
+  background-color: #2c2c2c;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  width: 320px;
+  min-width: 320px;
+  height: 500px; /* Altura fija */
+  padding: 15px;
+  box-sizing: border-box;
+  cursor: move;
+  transition: transform 0.2s;
+  display: flex;
+  flex-direction: column;
+}
+
+.column.dragging {
+  opacity: 0.5;
+  transform: scale(0.98);
+}
+
+.column-header {
+  background-color: #1e3a8a;
+  color: #e5e7eb;
+  padding: 10px;
+  border-radius: 4px;
+  text-align: center;
+  margin-bottom: 15px;
+  font-size: 1.2em;
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.column-header:hover {
+  background-color: #3b82f6;
+}
+
+.column-title {
+  flex-grow: 1;
+  text-align: center;
+}
+
+.column-header .delete-column-btn {
+  display: none; /* Oculta por defecto */
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: #991b1b;
+  color: #e5e7eb;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 0.8em;
+  cursor: pointer;
+}
+
+.column-header:hover .delete-column-btn {
+  display: flex; /* Muestra solo en hover */
+}
+
+.delete-column-btn:hover {
+  background-color: #dc2626;
+}
+
+.add-column-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #854d0e;
+  color: #e5e7eb;
+  border: none;
+  font-size: 1.5em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  margin: 0 20px; /* Aire a los lados */
+  align-self: center;
+}
+
+.add-column-btn:hover {
+  background-color: #d97706;
+}

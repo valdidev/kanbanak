@@ -1,0 +1,31 @@
+@media (max-width: 768px) {
+  .column {
+    width: 300px;
+    min-width: 300px;
+    height: 500px; /* Mantener altura fija */
+  }
+
+  .notification {
+    max-width: 90%;
+  }
+
+  .add-column-btn {
+    margin: 0 10px;
+  }
+
+  .kanban-board {
+    padding-right: 60px; /* Menos espacio en pantallas pequeñas */
+  }
+
+  .scroll-left {
+    left: 20px;
+  }
+
+  .scroll-right {
+    right: 20px;
+  }
+
+  .task-text {
+    max-width: 190px; /* Aumentado de 180px */
+  }
+}
